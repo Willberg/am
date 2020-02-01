@@ -29,7 +29,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -87,8 +87,13 @@ DATABASES = {
 
 # 设置全局认证
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": ['user.utils.auth.Authentication', ]  # 里面写你的认证的类的路径
+    "DEFAULT_AUTHENTICATION_CLASSES": ['user.utils.auth.Authentication', ],  # 里面写你的认证的类的路径
 }
+
+# 文件存储路径
+DEFAULT_FILE_DIR = "/home/john/tmp/"  # 临时文件存放路径
+if not os.path.exists(DEFAULT_FILE_DIR):
+    os.mkdir(DEFAULT_FILE_DIR)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators

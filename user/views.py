@@ -16,7 +16,8 @@ log = logging.getLogger('django')
 class RegisterView(APIView):
     authentication_classes = []
 
-    def post(self, request):
+    @staticmethod
+    def post(request):
         username = request._request.POST.get('username')
         password = request._request.POST.get('password')
         password = encrypt.digest(password)
@@ -42,7 +43,8 @@ class LoginView(APIView):
     # authentication_classes里面为空，代表不需要认证
     authentication_classes = []
 
-    def post(self, request):
+    @staticmethod
+    def post(request):
         ret = Result()
         username = request._request.POST.get('username')
         pwd = request._request.POST.get('password')
@@ -68,7 +70,8 @@ class LoginView(APIView):
 
 
 class LogoutView(APIView):
-    def post(self, request):
+    @staticmethod
+    def post(request):
         ret = Result()
         ret.token = None
         token = request._request.GET.get('token')
@@ -84,7 +87,8 @@ class LogoutView(APIView):
 
 
 class ChangePasswordView(APIView):
-    def post(self, request):
+    @staticmethod
+    def post(request):
         ret = Result()
         old_pwd = request._request.POST.get('oldPassword')
         old_pwd = encrypt.digest(old_pwd)
