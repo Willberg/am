@@ -43,7 +43,8 @@ CACHES = {
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'  # 引擎
 SESSION_CACHE_ALIAS = 'default'  # 使用的缓存别名（默认内存缓存，也可以是memcache），此处别名依赖缓存的设置
 
-SESSION_COOKIE_NAME = "amid"  # Session的cookie保存在浏览器上时的key,即:amid＝随机字符串
+SESSION_COOKIE_NAME = "dsessionid"  # Session的cookie保存在浏览器上时的key,即:dsessionid＝随机字符串
+SESSION_ID = "amid" # 用于从session中取出对应的user的id
 SESSION_COOKIE_PATH = "/"  # Session的cookie保存的路径
 SESSION_COOKIE_DOMAIN = None  # Session的cookie保存的域名
 SESSION_COOKIE_SECURE = False  # 是否Https传输cookie

@@ -1,11 +1,13 @@
 # Create your views here.
 import logging
 
+from django.core.cache import cache
 from django.db import transaction
 from django.http import JsonResponse
 from rest_framework.views import APIView
 
-from .models import UserInfo, UserToken
+from am.settings import SESSION_ID
+from .models import UserInfo
 from .utils import encrypt
 from .utils.errors import CODE_WRONG_AUTHENTICATION_INFO, get_error_message, CODE_SYS_DB_ERROR
 from .utils.result import Result
@@ -27,15 +29,18 @@ class RegisterView(APIView):
         user = UserInfo(username=username, password=password, language=language, user_type=1)
 
         ret = Result()
-        token = ret.token
         try:
             with transaction.atomic():
                 user.save()
-                UserToken.objects.update_or_create(user=user, defaults={'token': token})
+                # 保存到缓存
+                cache.set(user.id, user)
         except Exception as e:
             log.error(e)
             ret.code = CODE_SYS_DB_ERROR
             ret.message = get_error_message(CODE_SYS_DB_ERROR, language)
+
+        # 设置session
+        request.session[SESSION_ID] = user.id
         return JsonResponse(ret.serializer())
 
 
@@ -52,20 +57,13 @@ class LoginView(APIView):
         language = request._request.POST.get('language')
         if not language:
             language = 'EN'
-        obj = UserInfo.objects.filter(username=username, password=pwd).first()
-        if not obj:
+        user = UserInfo.objects.filter(username=username, password=pwd).first()
+        if not user:
             ret.code = CODE_WRONG_AUTHENTICATION_INFO
             ret.message = get_error_message(CODE_WRONG_AUTHENTICATION_INFO, language)
-            return JsonResponse(ret)
-        # 为用户创建token
-        # 存在就更新，不存在就创建
-        token = ret.token
-        try:
-            UserToken.objects.update_or_create(user=obj, defaults={'token': token})
-        except Exception as e:
-            log.error(e)
-            ret.code = CODE_SYS_DB_ERROR
-            ret.message = get_error_message(CODE_SYS_DB_ERROR, language)
+            return JsonResponse(ret.serializer())
+        # 设置session
+        request.session[SESSION_ID] = user.id
         return JsonResponse(ret.serializer())
 
 
@@ -73,16 +71,7 @@ class LogoutView(APIView):
     @staticmethod
     def post(request):
         ret = Result()
-        ret.token = None
-        token = request._request.GET.get('token')
-        user_token = UserToken.objects.filter(token=token).first()
-        language = user_token.user.language
-        try:
-            user_token.delete()
-        except Exception as e:
-            log.error(e)
-            ret.code = CODE_SYS_DB_ERROR
-            ret.message = get_error_message(CODE_SYS_DB_ERROR, language)
+        request.session.flush()
         return JsonResponse(ret.serializer())
 
 
@@ -95,17 +84,20 @@ class ChangePasswordView(APIView):
         new_pwd = request._request.POST.get('newPassword')
         new_pwd = encrypt.digest(new_pwd)
 
-        token = request._request.GET.get('token')
-        user = UserToken.objects.filter(token=token).first().user
+        uid = request.session.get(SESSION_ID)
+        user = cache.get(uid)
         language = user.language
         if user.password != old_pwd:
             ret.code = CODE_WRONG_AUTHENTICATION_INFO
             ret.message = get_error_message(ret.code, language)
-            return ret
+            return JsonResponse(ret.serializer())
 
         try:
             # 更新密码
-            UserInfo.objects.filter(username=user.username).update(password=new_pwd)
+            with transaction.atomic():
+                UserInfo.objects.filter(username=user.username).update(password=new_pwd)
+                user.password = new_pwd
+                cache.set(uid, user)
         except Exception as e:
             log.error(e)
             ret.code = CODE_SYS_DB_ERROR

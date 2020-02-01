@@ -1,17 +1,14 @@
 import time
 
-from user.utils import encrypt
-
 
 class Result(object):
-    __slots__ = ('_status', '_code', '_message', '_data', '_token', '_created')
+    __slots__ = ('_status', '_code', '_message', '_data', '_created')
 
     def __init__(self):
         self._status = True
         self._code = None
         self._message = None
         self._data = None
-        self._token = encrypt.digest_random()
         self._created = str(round(time.time() * 1000))
 
     def serializer(self):
@@ -57,14 +54,6 @@ class Result(object):
     @data.setter
     def data(self, data):
         self._data = data
-
-    @property
-    def token(self):
-        return self._token
-
-    @token.setter
-    def token(self, token):
-        self._token = token
 
     @property
     def created(self):

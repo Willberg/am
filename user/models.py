@@ -22,8 +22,3 @@ class UserInfo(models.Model):
     language = models.CharField(max_length=4, choices=LANGUAGE_CHOICES, default='EN')
     create_time = models.BigIntegerField(default=int(round(time.time() * 1000)))
     update_time = models.BigIntegerField(default=int(round(time.time() * 1000)))
-
-
-class UserToken(models.Model):
-    user = models.OneToOneField(UserInfo, on_delete=models.CASCADE)
-    token = models.CharField(max_length=64)
