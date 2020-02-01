@@ -125,3 +125,72 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# logs
+# EMAIL_HOST = 'smtp.qq.com'
+# EMAIL_PORT = 25
+# EMAIL_HOST_USER = 'sender@gmail.com'  # 发件箱
+# EMAIL_HOST_PASSWORD = 'xxxxx'  # 开启POP3/SMTP服务
+# SERVER_EMAIL = 'sender@gmail.com'  # 与发件箱一致
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# ADMINS = [('John', 'John@gmail.com'), ('Peter', 'Peter@gmail.com')]
+
+# LOGGING_DIR 日志文件存放目录
+LOGGING_DIR = "logs"  # 日志存放路径
+if not os.path.exists(LOGGING_DIR):
+    os.mkdir(LOGGING_DIR)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {  # 格式化器
+        'standard': {
+            'format': '[%(levelname)s][%(asctime)s][%(filename)s][%(funcName)s][%(lineno)d] > %(message)s'
+        },
+        'simple': {
+            'format': '[%(levelname)s]> %(message)s'
+        },
+    },
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'file_handler': {
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': '%s/info.log' % LOGGING_DIR,  # 具体日志文件的名字
+            'formatter': 'standard'
+        },  # 用于文件输出
+        # 'mail_admins': {
+        #     'level': 'ERROR',
+        #     'class': 'django.utils.log.AdminEmailHandler',
+        #     'formatter': 'standard'
+        # },
+    },
+    'loggers': {  # 日志分配到哪个handlers中
+        'mydjango': {
+            'handlers': ['console', 'file_handler'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        # 'django.request': {
+        #     'handlers': ['mail_admins'],
+        #     'level': 'ERROR',
+        #     'propagate': False,
+        # },
+        # 如果要将get,post请求同样写入到日志文件中，则这个触发器的名字必须交django,然后写到handler中
+        'django': {
+            'handlers': ['console', 'file_handler'],
+            'level': 'INFO',
+            'propagate': False
+        }
+    }
+}

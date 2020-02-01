@@ -6,7 +6,7 @@ import uuid
 from am.settings import SECRET_KEY
 
 
-def digest():
+def digest_random():
     k = str(round(time.time() * 1000)) + str(uuid.uuid1()).split('-')[0]
     m = hashlib.md5(k.encode('utf-8'))
     return m.hexdigest()

@@ -20,8 +20,8 @@ class UserInfo(models.Model):
     username = models.CharField(max_length=32)
     password = models.CharField(max_length=64)
     language = models.CharField(max_length=4, choices=LANGUAGE_CHOICES, default='EN')
-    create_time = models.IntegerField(default=int(round(time.time() * 1000)))
-    update_time = models.IntegerField(default=int(round(time.time() * 1000)))
+    create_time = models.BigIntegerField(default=int(round(time.time() * 1000)))
+    update_time = models.BigIntegerField(default=int(round(time.time() * 1000)))
 
 
 class UserToken(models.Model):

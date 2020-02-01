@@ -4,12 +4,24 @@ from user.utils import encrypt
 
 
 class Result(object):
-    __slots__ = ('_status', '_code', '_message', '_data', '_token', 'created')
+    __slots__ = ('_status', '_code', '_message', '_data', '_token', '_created')
 
     def __init__(self):
         self._status = True
-        self._token = encrypt.digest()
-        self.created = str(round(time.time() * 1000))
+        self._code = None
+        self._message = None
+        self._data = None
+        self._token = encrypt.digest_random()
+        self._created = str(round(time.time() * 1000))
+
+    def serializer(self):
+        d = dict()
+        for k in self.__slots__:
+            v = self.__getattribute__(k)
+            if v or k == '_status':
+                k = k[1:]
+                d[k] = v
+        return d
 
     @property
     def status(self):
@@ -27,6 +39,7 @@ class Result(object):
 
     @code.setter
     def code(self, code):
+        self._status = False
         self._code = code
 
     @property
@@ -48,3 +61,11 @@ class Result(object):
     @property
     def token(self):
         return self._token
+
+    @token.setter
+    def token(self, token):
+        self._token = token
+
+    @property
+    def created(self):
+        return self._created
