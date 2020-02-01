@@ -42,7 +42,7 @@ class LoginView(APIView):
     # authentication_classes里面为空，代表不需要认证
     authentication_classes = []
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         ret = Result()
         username = request._request.POST.get('username')
         pwd = request._request.POST.get('password')
@@ -72,10 +72,10 @@ class LogoutView(APIView):
         ret = Result()
         ret.token = None
         token = request._request.GET.get('token')
-        user = UserToken.objects.filter(token=token).first().user
-        language = user.language
+        user_token = UserToken.objects.filter(token=token).first()
+        language = user_token.user.language
         try:
-            user.delete()
+            user_token.delete()
         except Exception as e:
             log.error(e)
             ret.code = CODE_SYS_DB_ERROR
@@ -86,4 +86,24 @@ class LogoutView(APIView):
 class ChangePasswordView(APIView):
     def post(self, request):
         ret = Result()
-        return JsonResponse(ret)
+        old_pwd = request._request.POST.get('oldPassword')
+        old_pwd = encrypt.digest(old_pwd)
+        new_pwd = request._request.POST.get('newPassword')
+        new_pwd = encrypt.digest(new_pwd)
+
+        token = request._request.GET.get('token')
+        user = UserToken.objects.filter(token=token).first().user
+        language = user.language
+        if user.password != old_pwd:
+            ret.code = CODE_WRONG_AUTHENTICATION_INFO
+            ret.message = get_error_message(ret.code, language)
+            return ret
+
+        try:
+            # 更新密码
+            UserInfo.objects.filter(username=user.username).update(password=new_pwd)
+        except Exception as e:
+            log.error(e)
+            ret.code = CODE_SYS_DB_ERROR
+            ret.message = get_error_message(CODE_SYS_DB_ERROR, language)
+        return JsonResponse(ret.serializer())

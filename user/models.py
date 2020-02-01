@@ -16,9 +16,9 @@ class UserInfo(models.Model):
         ('EN', '英语'),
     )
 
-    user_type = models.IntegerField(choices=USER_TYPE)
-    username = models.CharField(max_length=32)
+    username = models.CharField(max_length=32, unique=True)
     password = models.CharField(max_length=64)
+    user_type = models.IntegerField(choices=USER_TYPE)
     language = models.CharField(max_length=4, choices=LANGUAGE_CHOICES, default='EN')
     create_time = models.BigIntegerField(default=int(round(time.time() * 1000)))
     update_time = models.BigIntegerField(default=int(round(time.time() * 1000)))
