@@ -28,7 +28,7 @@ class RegisterView(APIView):
             language = 'EN'
         user = UserInfo(username=username, password=password, language=language, user_type=1)
 
-        ret = Result()
+        result = Result()
         try:
             with transaction.atomic():
                 user.save()
@@ -36,12 +36,12 @@ class RegisterView(APIView):
                 cache.set(user.id, user)
         except Exception as e:
             log.error(e)
-            ret.code = CODE_SYS_DB_ERROR
-            ret.message = get_error_message(CODE_SYS_DB_ERROR, language)
+            result.code = CODE_SYS_DB_ERROR
+            result.message = get_error_message(CODE_SYS_DB_ERROR, language)
 
         # 设置session
         request.session[SESSION_ID] = user.id
-        return JsonResponse(ret.serializer())
+        return JsonResponse(result.serializer())
 
 
 class LoginView(APIView):
@@ -50,7 +50,7 @@ class LoginView(APIView):
 
     @staticmethod
     def post(request):
-        ret = Result()
+        result = Result()
         username = request._request.POST.get('username')
         pwd = request._request.POST.get('password')
         pwd = encrypt.digest(pwd)
@@ -59,26 +59,26 @@ class LoginView(APIView):
             language = 'EN'
         user = UserInfo.objects.filter(username=username, password=pwd).first()
         if not user:
-            ret.code = CODE_WRONG_AUTHENTICATION_INFO
-            ret.message = get_error_message(CODE_WRONG_AUTHENTICATION_INFO, language)
-            return JsonResponse(ret.serializer())
+            result.code = CODE_WRONG_AUTHENTICATION_INFO
+            result.message = get_error_message(CODE_WRONG_AUTHENTICATION_INFO, language)
+            return JsonResponse(result.serializer())
         # 设置session
         request.session[SESSION_ID] = user.id
-        return JsonResponse(ret.serializer())
+        return JsonResponse(result.serializer())
 
 
 class LogoutView(APIView):
     @staticmethod
     def post(request):
-        ret = Result()
+        result = Result()
         request.session.flush()
-        return JsonResponse(ret.serializer())
+        return JsonResponse(result.serializer())
 
 
 class ChangePasswordView(APIView):
     @staticmethod
     def post(request):
-        ret = Result()
+        result = Result()
         old_pwd = request._request.POST.get('oldPassword')
         old_pwd = encrypt.digest(old_pwd)
         new_pwd = request._request.POST.get('newPassword')
@@ -88,9 +88,9 @@ class ChangePasswordView(APIView):
         user = cache.get(uid)
         language = user.language
         if user.password != old_pwd:
-            ret.code = CODE_WRONG_AUTHENTICATION_INFO
-            ret.message = get_error_message(ret.code, language)
-            return JsonResponse(ret.serializer())
+            result.code = CODE_WRONG_AUTHENTICATION_INFO
+            result.message = get_error_message(result.code, language)
+            return JsonResponse(result.serializer())
 
         try:
             # 更新密码
@@ -100,6 +100,6 @@ class ChangePasswordView(APIView):
                 cache.set(uid, user)
         except Exception as e:
             log.error(e)
-            ret.code = CODE_SYS_DB_ERROR
-            ret.message = get_error_message(CODE_SYS_DB_ERROR, language)
-        return JsonResponse(ret.serializer())
+            result.code = CODE_SYS_DB_ERROR
+            result.message = get_error_message(CODE_SYS_DB_ERROR, language)
+        return JsonResponse(result.serializer())

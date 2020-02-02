@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from mongoengine import connect
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
@@ -44,7 +46,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'  # 引擎
 SESSION_CACHE_ALIAS = 'default'  # 使用的缓存别名（默认内存缓存，也可以是memcache），此处别名依赖缓存的设置
 
 SESSION_COOKIE_NAME = "dsessionid"  # Session的cookie保存在浏览器上时的key,即:dsessionid＝随机字符串
-SESSION_ID = "amid" # 用于从session中取出对应的user的id
+SESSION_ID = "amid"  # 用于从session中取出对应的user的id
 SESSION_COOKIE_PATH = "/"  # Session的cookie保存的路径
 SESSION_COOKIE_DOMAIN = None  # Session的cookie保存的域名
 SESSION_COOKIE_SECURE = False  # 是否Https传输cookie
@@ -109,8 +111,17 @@ DATABASES = {
         'PASSWORD': '123456',
         'HOST': '192.168.0.103',
         'PORT': '3306',
-    }
+    },
 }
+
+# mongo 设置
+MONGO_DB_NAME = 'am'
+MONGO_HOST = '192.168.0.103'
+MONGO_PORT = 27017
+MONGO_USER_NAME = 'root'
+MONGO_PASSWORD = '123456'
+connect(db=MONGO_DB_NAME, host=MONGO_HOST, port=MONGO_PORT, username=MONGO_USER_NAME, password=MONGO_PASSWORD,
+        authentication_source='admin')
 
 # 设置全局认证
 REST_FRAMEWORK = {
