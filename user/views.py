@@ -10,6 +10,7 @@ from am.settings import SESSION_ID
 from .models import UserInfo
 from .utils import encrypt
 from .utils.errors import CODE_WRONG_AUTHENTICATION_INFO, get_error_message, CODE_SYS_DB_ERROR
+from .utils.permission import VIPPermission
 from .utils.result import Result
 
 log = logging.getLogger('django')
@@ -76,6 +77,8 @@ class LogoutView(APIView):
 
 
 class ChangePasswordView(APIView):
+    permission_classes = [VIPPermission, ]
+
     @staticmethod
     def post(request):
         result = Result()

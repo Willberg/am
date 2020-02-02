@@ -127,11 +127,12 @@ connect(db=MONGO_DB_NAME, host=MONGO_HOST, port=MONGO_PORT, username=MONGO_USER_
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ['user.utils.auth.Authentication', ],  # 里面写你的认证的类的路径
     # 节流
-    "DEFAULT_THROTTLE_CLASSES": ['user.utils.throttle.VisitThrottle'],  # 全局配置，登录用户节流限制（10/m）
+    "DEFAULT_THROTTLE_CLASSES": ['user.utils.throttle.VisitThrottle', ],  # 全局配置，登录用户节流限制（10/m）
     "DEFAULT_THROTTLE_RATES": {
         'ANONYMOUS': '1/m',  # 没登录用户3/m，NBA就是scope定义的值
         'AUTH': '10/m',  # 登录用户10/m，NBAUser就是scope定义的值
-    }
+    },
+    # "DEFAULT_PERMISSION_CLASSES": ['user.utils.permission.VIPPermission', ],  # 全局配置
 }
 
 # 文件存储路径
