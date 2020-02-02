@@ -35,4 +35,4 @@ class TestView(APIView):
         content = req.GET['content']
         # 插入新数据
         text.create(name=name, content=content)
-        return JsonResponse(result)
+        return JsonResponse(result.serializer())
