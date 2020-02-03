@@ -1,6 +1,7 @@
 CODE_SYS_UNKNOWN = 'SYS.0001'
 CODE_SYS_DB_ERROR = 'SYS.0002'
 CODE_SYS_CONNECTION_ERROR = 'SYS.0003'
+CODE_SYS_MONGO_ERROR = 'SYS.0004'
 
 CODE_WRONG_AUTHENTICATION_INFO = 'USER.0001'
 
@@ -16,6 +17,10 @@ ERROR_CODES = {
     'SYS.0003': {
         'CN': '请求错误',
         'EN': 'connection error',
+    },
+    'SYS.0004': {
+        'CN': 'Mongo错误',
+        'EN': 'Mongo error',
     },
 
     'USER.0001': {

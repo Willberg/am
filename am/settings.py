@@ -129,8 +129,8 @@ REST_FRAMEWORK = {
     # 节流
     "DEFAULT_THROTTLE_CLASSES": ['user.utils.throttle.VisitThrottle', ],  # 全局配置，登录用户节流限制（10/m）
     "DEFAULT_THROTTLE_RATES": {
-        'ANONYMOUS': '1/m',  # 没登录用户3/m，NBA就是scope定义的值
-        'AUTH': '10/m',  # 登录用户10/m，NBAUser就是scope定义的值
+        'ANONYMOUS': '100/m',  # 没登录用户3/m，NBA就是scope定义的值
+        'AUTH': '1000/m',  # 登录用户10/m，NBAUser就是scope定义的值
     },
     # "DEFAULT_PERMISSION_CLASSES": ['user.utils.permission.VIPPermission', ],  # 全局配置
 }
