@@ -35,7 +35,12 @@ CACHES = {
         "LOCATION": "redis://192.168.0.105:6379",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            # 压缩支持
+            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+            # 配置默认连接池
             "CONNECTION_POOL_KWARGS": {"max_connections": 100},
+            # json 序列化,默认是使用pickle直接将对象存入redis,改用json
+            "SERIALIZER": "django_redis.serializers.json.JSONSerializer",
             "PASSWORD": "test123",
         }
     }

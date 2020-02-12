@@ -6,9 +6,9 @@ from django.db import transaction
 from django.http import JsonResponse
 from rest_framework.views import APIView
 
-from am.settings import DEFAULT_FILE_DIR, SESSION_ID
+from am.settings import DEFAULT_FILE_DIR
 from am.utils import encrypt
-from am.utils.cache import create_key, CACHE_FS_RTZ, CACHE_USER
+from am.utils.cache import create_key, CACHE_FS_RTZ
 from am.utils.errors import CODE_SYS_DB_ERROR, get_error_message
 from am.utils.result import Result
 from fs.models import RtzDoc, Rtz
@@ -40,9 +40,7 @@ class RtzUploadView(APIView):
     @staticmethod
     def post(request):
         result = Result()
-        uid = request.session.get(SESSION_ID)
-        user = cache.get(create_key(CACHE_USER, uid))
-        language = user.language
+        language = request._request.POST.get('language')
 
         # 图片处理
         rtz_doc = RtzDoc()
@@ -73,7 +71,8 @@ class RtzUploadView(APIView):
                 rtz.save()
                 # 序列化
                 result.data = RtzSerializer(rtz, many=False).data
-                cache(create_key(CACHE_FS_RTZ, rtz.id), result.data)
+                # bug所在，无法找到对应的client,因为没有使用cache.set方法
+                cache.set(create_key(CACHE_FS_RTZ, rtz.id), result.data)
                 # cache(create_key(CACHE_FS_RTZ, rtz.id), json.dumps(rtz, default=lambda obj: obj.__dict__))
         except Exception as e:
             log.error(e)
@@ -113,7 +112,9 @@ class RtzImgView(APIView):
         rtz_id = request._request.GET.get('rtz_id')
 
         # 从缓存中取出rtz
-        rtz = cache.get(create_key(CACHE_FS_RTZ, rtz_id))
+        rtz_dict = cache.get(create_key(CACHE_FS_RTZ, rtz_id))
+        rtz = Rtz()
+        rtz.__dict__ = rtz_dict
 
         # 从mongo中取出图片
         rtz_doc = RtzDoc.objects().get(id=rtz_id)

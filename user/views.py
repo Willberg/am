@@ -12,6 +12,7 @@ from am.utils.cache import CACHE_USER, create_key
 from am.utils.errors import CODE_WRONG_AUTHENTICATION_INFO, get_error_message, CODE_SYS_DB_ERROR
 from am.utils.result import Result
 from .models import UserInfo
+from .serializers import UserInfoSerializer
 from .utils.permission import VIPPermission
 
 log = logging.getLogger('django')
@@ -35,7 +36,8 @@ class RegisterView(APIView):
             with transaction.atomic():
                 user.save()
                 # 保存到缓存
-                cache.set(create_key(CACHE_USER, user.id), user)
+                u = UserInfoSerializer(user, many=False).data
+                cache.set(create_key(CACHE_USER, user.id), u)
         except Exception as e:
             log.error(e)
             result.code = CODE_SYS_DB_ERROR
@@ -89,7 +91,9 @@ class ChangePasswordView(APIView):
         new_pwd = encrypt.digest(new_pwd)
 
         uid = request.session.get(SESSION_ID)
-        user = cache.get(create_key(CACHE_USER, uid))
+        user_dict = cache.get(create_key(CACHE_USER, uid))
+        user = UserInfo()
+        user.__dict__ = user_dict
         language = user.language
         if user.password != old_pwd:
             result.code = CODE_WRONG_AUTHENTICATION_INFO
@@ -101,7 +105,8 @@ class ChangePasswordView(APIView):
             with transaction.atomic():
                 UserInfo.objects.filter(username=user.username).update(password=new_pwd)
                 user.password = new_pwd
-                cache.set(create_key(CACHE_USER, uid), user)
+                u = UserInfoSerializer(user, many=False).data
+                cache.set(create_key(CACHE_USER, uid), u)
         except Exception as e:
             log.error(e)
             result.code = CODE_SYS_DB_ERROR
