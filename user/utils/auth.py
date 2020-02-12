@@ -23,7 +23,7 @@ class Authentication(BaseAuthentication):
             if user:
                 # json序列化,并存入缓存
                 user_dict = UserInfoSerializer(user, many=False).data
-                cache.set(create_key(CACHE_USER, uid), user_dict)
+                cache.set(create_key(CACHE_USER, uid), user_dict, timeout=None)
 
         if not user_dict:
             raise exceptions.AuthenticationFailed('用户未登录')

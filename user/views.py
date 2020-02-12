@@ -37,7 +37,7 @@ class RegisterView(APIView):
                 user.save()
                 # 保存到缓存
                 u = UserInfoSerializer(user, many=False).data
-                cache.set(create_key(CACHE_USER, user.id), u)
+                cache.set(create_key(CACHE_USER, user.id), u, timeout=None)
         except Exception as e:
             log.error(e)
             result.code = CODE_SYS_DB_ERROR
@@ -76,7 +76,7 @@ class LoginView(APIView):
 
         # json序列化,并存入缓存
         user_dict = UserInfoSerializer(user, many=False).data
-        cache.set(create_key(CACHE_USER, user.id), user_dict)
+        cache.set(create_key(CACHE_USER, user.id), user_dict, timeout=None)
 
         # 隐藏密码
         u = UserInfoSerializer(user, many=False).data
@@ -121,7 +121,7 @@ class ChangePasswordView(APIView):
                 user.password = new_pwd
                 # 更新缓存
                 u = UserInfoSerializer(user, many=False).data
-                cache.set(create_key(CACHE_USER, uid), u)
+                cache.set(create_key(CACHE_USER, uid), u, timeout=None)
 
                 # 隐藏密码
                 u['password'] = "xxxxxx"

@@ -1,4 +1,5 @@
 # Create your views here.
+import base64
 import logging
 
 from django.core.cache import cache
@@ -72,7 +73,7 @@ class RtzUploadView(APIView):
                 # 序列化
                 result.data = RtzSerializer(rtz, many=False).data
                 # bug所在，无法找到对应的client,因为没有使用cache.set方法
-                cache.set(create_key(CACHE_FS_RTZ, rtz.id), result.data)
+                cache.set(create_key(CACHE_FS_RTZ, rtz.id), result.data, timeout=None)
                 # cache(create_key(CACHE_FS_RTZ, rtz.id), json.dumps(rtz, default=lambda obj: obj.__dict__))
         except Exception as e:
             log.error(e)
@@ -94,13 +95,16 @@ class RtzListView(APIView):
         count = request._request.GET.get('count')
 
         # 从数据库中取出list
+        rtz_dicts = []
         rtz_list = Rtz.objects.raw('select * from fs_rtz order by marks limit %s,%s' % (offset, count)).all()
         for rtz in rtz_list:
-            # 从mongo中取出图片
-            photo = RtzDoc.objects().get(id=rtz.doc_id).read()
-            rtz.photo = photo
+            rtz_dict = RtzSerializer(rtz, many=False).data
 
-        result.data = rtz_list
+            # 从mongo中取出图片
+            rtz_dict['photo'] = RtzDoc.objects().get(id=rtz.doc_id).read()
+            rtz_dicts.append(rtz_dict)
+
+        result.data = rtz_dicts
         return JsonResponse(result.serializer())
 
 
@@ -113,13 +117,13 @@ class RtzImgView(APIView):
 
         # 从缓存中取出rtz
         rtz_dict = cache.get(create_key(CACHE_FS_RTZ, rtz_id))
-        rtz = Rtz()
-        rtz.__dict__ = rtz_dict
 
         # 从mongo中取出图片
-        rtz_doc = RtzDoc.objects().get(id=rtz_id)
+        rtz_doc = RtzDoc.objects().get(id=rtz_dict['doc_id'])
 
         result = Result()
-        rtz.photo = rtz_doc.photo.read()
-        result.data = rtz
+        img = rtz_doc.photo.read()
+        print(img)
+        rtz_dict['photo'] = base64.decode(img)
+        result.data = rtz_dict
         return JsonResponse(result.serializer())
