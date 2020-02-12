@@ -22,8 +22,8 @@ class Authentication(BaseAuthentication):
             user = UserInfo.objects.filter(id=uid).first()
             if user:
                 # json序列化,并存入缓存
-                u = UserInfoSerializer(user, many=False).data
-                cache.set(create_key(CACHE_USER, uid), u)
+                user_dict = UserInfoSerializer(user, many=False).data
+                cache.set(create_key(CACHE_USER, uid), user_dict)
 
         if not user_dict:
             raise exceptions.AuthenticationFailed('用户未登录')

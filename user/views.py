@@ -45,6 +45,11 @@ class RegisterView(APIView):
 
         # 设置session
         request.session[SESSION_ID] = user.id
+
+        # 隐藏密码
+        u = UserInfoSerializer(user, many=False).data
+        u['password'] = "xxxxxx"
+        result.data = u
         return JsonResponse(result.serializer())
 
 
@@ -68,6 +73,15 @@ class LoginView(APIView):
             return JsonResponse(result.serializer())
         # 设置session
         request.session[SESSION_ID] = user.id
+
+        # json序列化,并存入缓存
+        user_dict = UserInfoSerializer(user, many=False).data
+        cache.set(create_key(CACHE_USER, user.id), user_dict)
+
+        # 隐藏密码
+        u = UserInfoSerializer(user, many=False).data
+        u['password'] = "xxxxxx"
+        result.data = u
         return JsonResponse(result.serializer())
 
 
@@ -103,10 +117,15 @@ class ChangePasswordView(APIView):
         try:
             # 更新密码
             with transaction.atomic():
-                UserInfo.objects.filter(username=user.username).update(password=new_pwd)
+                UserInfo.objects.filter(id=uid).update(password=new_pwd)
                 user.password = new_pwd
+                # 更新缓存
                 u = UserInfoSerializer(user, many=False).data
                 cache.set(create_key(CACHE_USER, uid), u)
+
+                # 隐藏密码
+                u['password'] = "xxxxxx"
+                result.data = u
         except Exception as e:
             log.error(e)
             result.code = CODE_SYS_DB_ERROR
