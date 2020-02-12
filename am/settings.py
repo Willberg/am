@@ -32,7 +32,7 @@ ALLOWED_HOSTS = ['*']
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://192.168.0.103:6379",
+        "LOCATION": "redis://192.168.0.105:6379",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "CONNECTION_POOL_KWARGS": {"max_connections": 100},
@@ -109,14 +109,14 @@ DATABASES = {
         'NAME': 'am',
         'USER': 'root',
         'PASSWORD': '123456',
-        'HOST': '192.168.0.103',
+        'HOST': '192.168.0.105',
         'PORT': '3306',
     },
 }
 
 # mongo 设置
 MONGO_DB_NAME = 'am'
-MONGO_HOST = '192.168.0.103'
+MONGO_HOST = '192.168.0.105'
 MONGO_PORT = 27017
 MONGO_USER_NAME = 'root'
 MONGO_PASSWORD = '123456'

@@ -1,4 +1,5 @@
 # Create your views here.
+import json
 import logging
 
 from django.core.cache import cache
@@ -80,9 +81,10 @@ class RtzUploadView(APIView):
         rtz.tags = request._request.POST.get('tags')
 
         try:
+            # 事务处理
             with transaction.atomic():
                 rtz.save()
-                cache(create_key(CACHE_FS_RTZ, rtz.id), rtz)
+                cache(create_key(CACHE_FS_RTZ, rtz.id), json.dumps(rtz))
         except Exception as e:
             log.error(e)
             result.code = CODE_SYS_DB_ERROR
@@ -104,7 +106,13 @@ class RtzListView(APIView):
         count = request._request.GET.get('count')
 
         # 从数据库中取出list
-        rtz_list = list()
+        rtz_list = Rtz.objects.raw('select * from fs_rtz order by marks limit %s,%s' % (offset, count)).all()
+        for rtz in rtz_list:
+            # 从mongo中取出图片
+            photo = RtzDoc.objects().get(id=rtz.doc_id).read()
+            rtz.photo = photo
+
+        result.data = rtz_list
         return JsonResponse(result.serializer())
 
 
@@ -116,13 +124,12 @@ class RtzImgView(APIView):
         rtz_id = request._request.GET.get('rtz_id')
 
         # 从缓存中取出rtz
-        rtz = cache(create_key(CACHE_FS_RTZ, rtz_id))
+        rtz = cache.get(create_key(CACHE_FS_RTZ, rtz_id))
 
         # 从mongo中取出图片
-        rtz_doc = RtzDoc()
-        rtz_doc.photo.get(rtz.doc_id)
+        rtz_doc = RtzDoc.objects().get(id=rtz_id)
 
-        # rtz.photo =
         result = Result()
+        rtz.photo = rtz_doc.photo.read()
         result.data = rtz
         return JsonResponse(result.serializer())

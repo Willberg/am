@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models import Model
 from mongoengine import Document, FileField, StringField
 
 
@@ -14,7 +13,7 @@ class RtzDoc(Document):
 
 
 # 图片model
-class Rtz(Model):
+class Rtz(models.Model):
     doc_id = models.CharField(max_length=64, unique=True)
     family = models.CharField(max_length=64)
     person_name = models.CharField(max_length=64)
@@ -25,7 +24,7 @@ class Rtz(Model):
 
 
 # 评论model
-class RtzComment(Model):
+class RtzComment(models.Model):
     user_id = models.BigIntegerField()
     rtz_id = models.BigIntegerField()
     comment = models.CharField(max_length=512)

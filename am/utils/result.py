@@ -12,13 +12,15 @@ class Result(object):
         self._created = str(round(time.time() * 1000))
 
     def serializer(self):
-        d = dict()
+        # 将_data序列化
+        res = dict()
         for k in self.__slots__:
             v = self.__getattribute__(k)
-            if v or k == '_status':
+            if v:
                 k = k[1:]
-                d[k] = v
-        return d
+                res[k] = v
+
+        return res
 
     @property
     def status(self):
