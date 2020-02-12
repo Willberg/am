@@ -1,4 +1,3 @@
-# Create your models here.
 import time
 
 from django.db import models

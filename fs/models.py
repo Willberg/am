@@ -1,11 +1,5 @@
 from django.db import models
-from mongoengine import Document, FileField, StringField
-
-
-# Create your models here.
-class TextModel(Document):
-    name = StringField(max_length=30)
-    content = StringField(max_length=255)
+from mongoengine import Document, FileField
 
 
 class RtzDoc(Document):

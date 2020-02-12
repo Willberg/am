@@ -1,5 +1,4 @@
 # Create your views here.
-import json
 import logging
 
 from django.core.cache import cache
@@ -12,7 +11,8 @@ from am.utils import encrypt
 from am.utils.cache import create_key, CACHE_FS_RTZ, CACHE_USER
 from am.utils.errors import CODE_SYS_DB_ERROR, get_error_message
 from am.utils.result import Result
-from fs.models import TextModel, RtzDoc, Rtz
+from fs.models import RtzDoc, Rtz
+from fs.serializers import RtzSerializer
 from user.utils.permission import SVIPPermission
 
 log = logging.getLogger('django')
@@ -31,19 +31,6 @@ class TmpUploadView(APIView):
                 f.write(chunk)
 
         result.data = fn
-        return JsonResponse(result.serializer())
-
-
-class TestView(APIView):
-
-    @staticmethod
-    def get(req):
-        result = Result()
-        text = TextModel.objects()
-        name = req.GET['name']
-        content = req.GET['content']
-        # 插入新数据
-        text.create(name=name, content=content)
         return JsonResponse(result.serializer())
 
 
@@ -84,13 +71,15 @@ class RtzUploadView(APIView):
             # 事务处理
             with transaction.atomic():
                 rtz.save()
-                cache(create_key(CACHE_FS_RTZ, rtz.id), json.dumps(rtz))
+                # 序列化
+                result.data = RtzSerializer(rtz, many=False).data
+                cache(create_key(CACHE_FS_RTZ, rtz.id), result.data)
+                # cache(create_key(CACHE_FS_RTZ, rtz.id), json.dumps(rtz, default=lambda obj: obj.__dict__))
         except Exception as e:
             log.error(e)
             result.code = CODE_SYS_DB_ERROR
             result.message = get_error_message(result.code, language)
 
-        result.data = rtz
         return JsonResponse(result.serializer())
 
 
