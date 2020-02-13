@@ -32,7 +32,7 @@ ALLOWED_HOSTS = ['*']
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://192.168.0.105:6379",
+        "LOCATION": "redis://192.168.0.105:6379/0",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             # 压缩支持
@@ -70,7 +70,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'fs',
     'user',
 ]
 
@@ -119,15 +118,6 @@ DATABASES = {
     },
 }
 
-# mongo 设置
-MONGO_DB_NAME = 'am'
-MONGO_HOST = '192.168.0.105'
-MONGO_PORT = 27017
-MONGO_USER_NAME = 'root'
-MONGO_PASSWORD = '123456'
-connect(db=MONGO_DB_NAME, host=MONGO_HOST, port=MONGO_PORT, username=MONGO_USER_NAME, password=MONGO_PASSWORD,
-        authentication_source='admin')
-
 # 设置全局认证
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ['user.utils.auth.Authentication', ],  # 里面写你的认证的类的路径
@@ -139,11 +129,6 @@ REST_FRAMEWORK = {
     },
     # "DEFAULT_PERMISSION_CLASSES": ['user.utils.permission.VIPPermission', ],  # 全局配置
 }
-
-# 文件存储路径
-DEFAULT_FILE_DIR = "/home/john/tmp/"  # 临时文件存放路径
-if not os.path.exists(DEFAULT_FILE_DIR):
-    os.mkdir(DEFAULT_FILE_DIR)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
