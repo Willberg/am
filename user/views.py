@@ -53,9 +53,8 @@ class RegisterView(APIView):
         request.session[SESSION_ID] = user.id
 
         # 隐藏密码
-        u = UserInfoSerializer(user, many=False).data
-        u['password'] = "xxxxxx"
-        result.data = u
+        user_dict['password'] = "******"
+        result.data = user_dict
         return JsonResponse(result.serializer())
 
 
@@ -86,7 +85,7 @@ class LoginView(APIView):
 
         # 隐藏密码
         u = UserInfoSerializer(user, many=False).data
-        u['password'] = "xxxxxx"
+        u['password'] = "******"
         result.data = u
         return JsonResponse(result.serializer())
 
@@ -130,7 +129,7 @@ class ChangePasswordView(APIView):
                 cache.set(create_key(CACHE_USER, uid), u, timeout=None)
 
                 # 隐藏密码
-                u['password'] = "xxxxxx"
+                u['password'] = "******"
                 result.data = u
         except Exception as e:
             log.error(e)
