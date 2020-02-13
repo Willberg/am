@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from am.settings import SESSION_ID
 from am.utils import encrypt
 from am.utils.cache import CACHE_USER, create_key
-from am.utils.errors import CODE_WRONG_AUTHENTICATION_INFO, get_error_message, CODE_SYS_DB_ERROR
+from am.utils.errors import CODE_WRONG_AUTHENTICATION_INFO, get_error_message, CODE_SYS_DB_ERROR, CODE_USERNAME_EXISTED
 from am.utils.result import Result
 from .models import UserInfo
 from .serializers import UserInfoSerializer
@@ -33,11 +33,17 @@ class RegisterView(APIView):
 
         result = Result()
         try:
+            u = UserInfo.objects.filter(username=username).first()
+            if u:
+                result.code = CODE_USERNAME_EXISTED
+                result.message = get_error_message(result.code, language)
+                return JsonResponse(result.serializer())
+
             with transaction.atomic():
                 user.save()
                 # 保存到缓存
-                u = UserInfoSerializer(user, many=False).data
-                cache.set(create_key(CACHE_USER, user.id), u, timeout=None)
+                user_dict = UserInfoSerializer(user, many=False).data
+                cache.set(create_key(CACHE_USER, user.id), user_dict, timeout=None)
         except Exception as e:
             log.error(e)
             result.code = CODE_SYS_DB_ERROR

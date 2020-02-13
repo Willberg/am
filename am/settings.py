@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-from mongoengine import connect
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -27,38 +26,6 @@ SECRET_KEY = 'ec%fyp0!@l7t)%dx@t+lmcp%$r*8uwjmh65_l^&0wgq&a*7!xh'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
-# redis在django中的配置
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://192.168.0.105:6379/0",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            # 压缩支持
-            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
-            # 配置默认连接池
-            "CONNECTION_POOL_KWARGS": {"max_connections": 100},
-            # json 序列化,默认是使用pickle直接将对象存入redis,改用json
-            "SERIALIZER": "django_redis.serializers.json.JSONSerializer",
-            "PASSWORD": "test123",
-        }
-    }
-}
-
-# session 设置
-SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'  # 引擎
-SESSION_CACHE_ALIAS = 'default'  # 使用的缓存别名（默认内存缓存，也可以是memcache），此处别名依赖缓存的设置
-
-SESSION_COOKIE_NAME = "dsessionid"  # Session的cookie保存在浏览器上时的key,即:dsessionid＝随机字符串
-SESSION_ID = "amid"  # 用于从session中取出对应的user的id
-SESSION_COOKIE_PATH = "/"  # Session的cookie保存的路径
-SESSION_COOKIE_DOMAIN = None  # Session的cookie保存的域名
-SESSION_COOKIE_SECURE = False  # 是否Https传输cookie
-SESSION_COOKIE_HTTPONLY = True  # 是否Session的cookie只支持http传输
-SESSION_COOKIE_AGE = 2 * 7 * 24 * 3600  # Session的cookie失效日期（2周）
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # 是否关闭浏览器使得Session过期
-SESSION_SAVE_EVERY_REQUEST = False  # 是否每次请求都保存Session，默认修改之后才保存
 
 # Application definition
 
@@ -103,33 +70,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'am.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'OPTIONS': {'init_command': 'SET default_storage_engine=INNODB;'},
-        'NAME': 'am',
-        'USER': 'root',
-        'PASSWORD': '123456',
-        'HOST': '192.168.0.105',
-        'PORT': '3306',
-    },
-}
-
-# 设置全局认证
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": ['user.utils.auth.Authentication', ],  # 里面写你的认证的类的路径
-    # 节流
-    "DEFAULT_THROTTLE_CLASSES": ['user.utils.throttle.VisitThrottle', ],  # 全局配置，登录用户节流限制（10/m）
-    "DEFAULT_THROTTLE_RATES": {
-        'ANONYMOUS': '100/m',  # 没登录用户3/m，NBA就是scope定义的值
-        'AUTH': '1000/m',  # 登录用户10/m，NBAUser就是scope定义的值
-    },
-    # "DEFAULT_PERMISSION_CLASSES": ['user.utils.permission.VIPPermission', ],  # 全局配置
-}
-
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -165,6 +105,65 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# 设置全局认证
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": ['user.utils.auth.Authentication', ],  # 里面写你的认证的类的路径
+    # 节流
+    "DEFAULT_THROTTLE_CLASSES": ['user.utils.throttle.VisitThrottle', ],  # 全局配置，登录用户节流限制（10/m）
+    "DEFAULT_THROTTLE_RATES": {
+        'ANONYMOUS': '100/m',  # 没登录用户3/m，NBA就是scope定义的值
+        'AUTH': '1000/m',  # 登录用户10/m，NBAUser就是scope定义的值
+    },
+    # "DEFAULT_PERMISSION_CLASSES": ['user.utils.permission.VIPPermission', ],  # 全局配置
+}
+
+# redis在django中的配置
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://192.168.0.105:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            # 压缩支持
+            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+            # 配置默认连接池
+            "CONNECTION_POOL_KWARGS": {"max_connections": 100},
+            # json 序列化,默认是使用pickle直接将对象存入redis,改用json
+            "SERIALIZER": "django_redis.serializers.json.JSONSerializer",
+            "PASSWORD": "test123",
+        }
+    }
+}
+
+# session 设置
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'  # 引擎
+SESSION_CACHE_ALIAS = 'default'  # 使用的缓存别名（默认内存缓存，也可以是memcache），此处别名依赖缓存的设置
+
+SESSION_COOKIE_NAME = "dsessionid"  # Session的cookie保存在浏览器上时的key,即:dsessionid＝随机字符串
+SESSION_ID = "amid"  # 用于从session中取出对应的user的id
+SESSION_COOKIE_PATH = "/"  # Session的cookie保存的路径
+SESSION_COOKIE_DOMAIN = None  # Session的cookie保存的域名
+SESSION_COOKIE_SECURE = False  # 是否Https传输cookie
+SESSION_COOKIE_HTTPONLY = True  # 是否Session的cookie只支持http传输
+SESSION_COOKIE_AGE = 2 * 7 * 24 * 3600  # Session的cookie失效日期（2周）
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # 是否关闭浏览器使得Session过期
+SESSION_SAVE_EVERY_REQUEST = False  # 是否每次请求都保存Session，默认修改之后才保存
+
+# Database
+# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'OPTIONS': {'init_command': 'SET default_storage_engine=INNODB;'},
+        'NAME': 'am',
+        'USER': 'root',
+        'PASSWORD': '123456',
+        'HOST': '192.168.0.105',
+        'PORT': '3306',
+    },
+}
 
 # logs
 # EMAIL_HOST = 'smtp.qq.com'
