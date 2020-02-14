@@ -19,8 +19,7 @@ class SessionView(APIView):
 
     @staticmethod
     def post(request):
-        cookie_name = request.POST.get('cookie_name')
-        # todo 如何通过cookiename找到对应的session
+        # 只要请求将cookies传过来就可以正确找到session
         uid = request.session.get(SESSION_ID)
 
         result = Result()

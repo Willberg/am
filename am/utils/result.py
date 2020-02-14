@@ -16,7 +16,8 @@ class Result(object):
         res = dict()
         for k in self.__slots__:
             v = self.__getattribute__(k)
-            if v:
+            # status为False,也要序列化
+            if v or k == "_status":
                 k = k[1:]
                 res[k] = v
 

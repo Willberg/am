@@ -8,6 +8,7 @@ class Authentication(BaseAuthentication):
     """用于服务验证"""
 
     def authenticate(self, request):
+        # headers里-会被处理掉，尽量不带-
         service_name = request.headers['service']
         secret = request.headers['secret']
 

@@ -237,7 +237,7 @@ LOGGING = {
 
 # 从服务发现中心获取各项服务
 DROWRANGER_NAME = "drowranger_0001"
-DROWRANGER_SECRET = "3839c59f88e4d8c0234920b36b7b57ad"
+DROWRANGER_SECRET = "90cea09b4cf234a146a232a8e356e507"
 DROWRANGER_SERVICE_URL = "http://127.0.0.1:10000/api/services/v1/list"
 headers = {
     "service": DROWRANGER_NAME,
