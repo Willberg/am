@@ -23,10 +23,10 @@ class RegisterView(APIView):
 
     @staticmethod
     def post(request):
-        username = request._request.POST.get('username')
-        password = request._request.POST.get('password')
+        username = request.POST.get('username')
+        password = request.POST.get('password')
         password = encrypt.digest(password)
-        language = request._request.POST.get('language')
+        language = request.POST.get('language')
         if not language:
             language = 'EN'
         user = UserInfo(username=username, password=password, language=language, user_type=1)
@@ -65,10 +65,10 @@ class LoginView(APIView):
     @staticmethod
     def post(request):
         result = Result()
-        username = request._request.POST.get('username')
-        pwd = request._request.POST.get('password')
+        username = request.POST.get('username')
+        pwd = request.POST.get('password')
         pwd = encrypt.digest(pwd)
-        language = request._request.POST.get('language')
+        language = request.POST.get('language')
         if not language:
             language = 'EN'
         user = UserInfo.objects.filter(username=username, password=pwd).first()
@@ -104,9 +104,9 @@ class ChangePasswordView(APIView):
     @staticmethod
     def post(request):
         result = Result()
-        old_pwd = request._request.POST.get('oldPassword')
+        old_pwd = request.POST.get('oldPassword')
         old_pwd = encrypt.digest(old_pwd)
-        new_pwd = request._request.POST.get('newPassword')
+        new_pwd = request.POST.get('newPassword')
         new_pwd = encrypt.digest(new_pwd)
 
         uid = request.session.get(SESSION_ID)

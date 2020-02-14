@@ -36,5 +36,5 @@ ERROR_CODES = {
 }
 
 
-def get_error_message(code, language):
+def get_error_message(code, language='EN'):
     return ERROR_CODES[code][language]

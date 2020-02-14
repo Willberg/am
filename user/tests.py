@@ -4,6 +4,7 @@ from datetime import datetime
 
 import logstash
 import pika
+import requests
 from elasticsearch import Elasticsearch
 
 
@@ -66,7 +67,7 @@ class TestRabbitmq:
     def test_rb_c(self):
         channel = self.connection.channel()
         m = channel.basic_publish(exchange='test', routing_key='test',
-                              body=b'Test message.')
+                                  body=b'Test message.')
         self.connection.close()
 
     def test_rb_r(self):
@@ -87,6 +88,16 @@ class TestRabbitmq:
         self.connection.close()
 
 
+class TestHttpclient:
+    def test_get_services(self):
+        headers = {
+            "service": "drowranger_0001",
+            "secret": "3839c59f88e4d8c0234920b36b7b57ad"
+        }
+        r = requests.get("http://127.0.0.1:10000/api/services/v1/list", headers=headers)
+        print(r.json())
+
+
 if __name__ == '__main__':
     # test = TestEs()
     # test.test_es()
@@ -94,6 +105,9 @@ if __name__ == '__main__':
     # test = TestLogstash()
     # test.test_log()
 
-    test = TestRabbitmq()
+    # test = TestRabbitmq()
     # test.test_rb_c()
-    test.test_rb_r()
+    # test.test_rb_r()
+
+    test = TestHttpclient()
+    test.test_get_services()

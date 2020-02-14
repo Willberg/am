@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import requests
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -233,3 +234,19 @@ LOGGING = {
         }
     }
 }
+
+# 从服务发现中心获取各项服务
+DROWRANGER_NAME = "drowranger_0001"
+DROWRANGER_SECRET = "3839c59f88e4d8c0234920b36b7b57ad"
+DROWRANGER_SERVICE_URL = "http://127.0.0.1:10000/api/services/v1/list"
+headers = {
+    "service": DROWRANGER_NAME,
+    "secret": DROWRANGER_SECRET
+}
+DROWRANGER_SERVICE_LIST = requests.get(DROWRANGER_SERVICE_URL, headers=headers).json()['data']
+
+# SESSION服务
+SESSION_SERVICE_ID = 3
+for sess in DROWRANGER_SERVICE_LIST:
+    if int(sess['id']) == SESSION_SERVICE_ID:
+        SESSION_SERVICE = sess
