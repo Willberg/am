@@ -243,10 +243,8 @@ headers = {
     "service": DROWRANGER_NAME,
     "secret": DROWRANGER_SECRET
 }
-DROWRANGER_SERVICE_LIST = requests.get(DROWRANGER_SERVICE_URL, headers=headers).json()['data']
+DROWRANGER_SERVICE_DICTS = requests.get(DROWRANGER_SERVICE_URL, headers=headers).json()['data']
 
 # SESSION服务
-SESSION_SERVICE_ID = 3
-for sess in DROWRANGER_SERVICE_LIST:
-    if int(sess['id']) == SESSION_SERVICE_ID:
-        SESSION_SERVICE = sess
+SESSION_SERVICE_NAME = 'am_0001'
+SESSION_SERVICE = DROWRANGER_SERVICE_DICTS[SESSION_SERVICE_NAME]
