@@ -1,7 +1,7 @@
 from rest_framework import exceptions
 from rest_framework.authentication import BaseAuthentication
 
-from am.settings import SESSION_SERVICE
+from am.settings import LOCAL_SERVICE
 
 
 class Authentication(BaseAuthentication):
@@ -15,14 +15,13 @@ class Authentication(BaseAuthentication):
         if not service_name or not secret:
             raise exceptions.AuthenticationFailed('找不到服务')
 
-        session_dict = SESSION_SERVICE
-        if not session_dict:
+        if not LOCAL_SERVICE:
             raise exceptions.AuthenticationFailed('找不到服务')
 
-        if session_dict['secret'] != secret:
+        if service_name != LOCAL_SERVICE['service_name'] or secret != LOCAL_SERVICE['secret']:
             raise exceptions.AuthenticationFailed('找不到服务')
 
-        return session_dict, None
+        return LOCAL_SERVICE, None
 
     def authenticate_header(self, request):
         pass
