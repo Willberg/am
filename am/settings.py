@@ -14,9 +14,6 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import requests
-from django.core.cache import cache
-
-from am.utils.cache import CACHE_LOCAL_SERVICE
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -243,19 +240,12 @@ DROWRANGER_NAME = "drowranger_0001"
 DROWRANGER_SECRET = "90cea09b4cf234a146a232a8e356e507"
 DROWRANGER_SERVICE_URL = "http://127.0.0.1:10000/api/services/v1/list"
 
-# 本服务名字（SESSION服务）
-LOCAL_SERVICE_NAME = 'am_0001'
-LOCAL_SERVICE = cache.get(CACHE_LOCAL_SERVICE)
+headers = {
+    "service": DROWRANGER_NAME,
+    "secret": DROWRANGER_SECRET
+}
+DROWRANGER_SERVICE_DICTS = requests.get(DROWRANGER_SERVICE_URL, headers=headers).json()['data']
 
-if not LOCAL_SERVICE:
-    headers = {
-        "service": DROWRANGER_NAME,
-        "secret": DROWRANGER_SECRET
-    }
-
-    req_data = {
-        "service_name": LOCAL_SERVICE_NAME
-    }
-    service_dict = requests.get(DROWRANGER_SERVICE_URL, data=req_data, headers=headers).json()['data']
-    cache.set(CACHE_LOCAL_SERVICE, service_dict)
-    LOCAL_SERVICE = service_dict
+# SESSION服务
+SESSION_SERVICE_NAME = 'am_0001'
+SESSION_SERVICE = DROWRANGER_SERVICE_DICTS[SESSION_SERVICE_NAME]
