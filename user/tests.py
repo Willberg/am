@@ -62,7 +62,7 @@ class TestRabbitmq:
     def __init__(self):
         credentials = pika.PlainCredentials('root', '123456')
         self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host='192.168.0.105 ', port=5672, virtual_host='/test', credentials=credentials))
+            pika.ConnectionParameters(host='192.168.0.105', port=5672, virtual_host='/', credentials=credentials))
 
     def test_rb_c(self):
         channel = self.connection.channel()
